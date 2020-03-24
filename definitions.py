@@ -3,7 +3,8 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parent.absolute()
 DATA_DIR = "data"
 
-COMPETITION_NAME = "covid19-global-forecasting-week-1"
+DATASET_NAME = "imdevskp/corona-virus-report"
+DATA_FILE = 'covid_19_clean_complete.csv'
 
 MISSING_TOKEN_MSG = """
 Cannot access Kaggle data

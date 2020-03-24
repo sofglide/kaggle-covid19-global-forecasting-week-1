@@ -1,9 +1,6 @@
 """downloads data from Kaggle."""
 
-from pathlib import Path
-from zipfile import ZipFile
-
-from definitions import COMPETITION_NAME, DATA_DIR, MISSING_TOKEN_MSG, ROOT_DIR
+from definitions import DATA_DIR, DATASET_NAME, MISSING_TOKEN_MSG, ROOT_DIR
 
 try:
     import kaggle
@@ -12,7 +9,9 @@ except OSError:
     raise
 
 
-def download_data_from_kaggle(force: bool = False, quiet: bool = False) -> None:
+def download_data_from_kaggle(
+    force: bool = False, quiet: bool = False, unzip=True
+) -> None:
     """Downloads competition data from Kaggle
 
     Parameters
@@ -21,17 +20,15 @@ def download_data_from_kaggle(force: bool = False, quiet: bool = False) -> None:
         overwrite exisiting data, by default False
     quiet : bool, optional
         quiet mode, by default False
+    unzip : bool, optional
+        unzip files, by default True
     """
     data_path = ROOT_DIR / DATA_DIR
     data_path.mkdir(exist_ok=True)
 
-    kaggle.api.competition_download_files(
-        COMPETITION_NAME, ROOT_DIR / DATA_DIR, force=force, quiet=quiet
+    kaggle.api.dataset_download_files(
+        DATASET_NAME, ROOT_DIR / DATA_DIR, force=force, quiet=quiet, unzip=unzip
     )
-
-    data_file = next(Path(data_path).glob(f"{COMPETITION_NAME}*"))
-    with ZipFile(data_file) as zip_obj:
-        zip_obj.extractall(path=data_path)
 
 
 if __name__ == "__main__":
