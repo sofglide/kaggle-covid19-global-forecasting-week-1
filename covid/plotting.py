@@ -35,9 +35,9 @@ def plot_by_country(
 
     _, ax = plt.subplots(figsize=figsize)
     data_copy = data.copy()
-    if data_copy.index.dtype == 'timedelta64[ns]':
-        data_copy.index = (data_copy.index / pd.Timedelta(1, 'd')).astype(int)
-        data_copy.index.name = 'days'
+    if data_copy.index.dtype == "timedelta64[ns]":
+        data_copy.index = (data_copy.index / pd.Timedelta(1, "d")).astype(int)
+        data_copy.index.name = "days"
 
     grouped_data = data_copy.groupby("country")[column]
     grouped_data.plot(
@@ -45,10 +45,10 @@ def plot_by_country(
     )
 
     ax.set(ylabel=column)
-    if data_copy.index.dtype == 'datetime64[ns]':
+    if data_copy.index.dtype == "datetime64[ns]":
         # set ticks every week
         ax.xaxis.set_major_locator(mdates.WeekdayLocator())
         # set major ticks format
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %d"))
-    
+
     plt.show()
