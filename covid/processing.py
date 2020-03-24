@@ -1,6 +1,6 @@
 """Data processing
 """
-from typing import List
+from typing import List, Optional
 
 import pandas as pd
 
@@ -59,22 +59,30 @@ def filter_by_trigger_date(
 
 
 def filter_data_by_countries(
-    data: pd.DataFrame, countries: List[str], countries_with_states: List[str]
+    data: pd.DataFrame,
+    countries: Optional[List[str]] = None,
+    countries_with_states: Optional[List[str]] = None,
+    states: Optional[List[str]] = None,
 ) -> pd.DataFrame:
     """Selects data based on a list of countries
     Parameters
     ----------
     data : pd.DataFrame
         dataset
-    countries : List[str]
-        countries with mainland only
-    countries_with_states : List[str]
-        countries with multiple states (will be aggregated by sum)
+    countries : List[str], optional
+        countries with mainland only, by default None
+    countries_with_states : List[str], optional
+        countries with multiple states (will be aggregated by sum), by default None
+    states : List[str], optional
+        states to be considered individually, by default None
     Returns
     -------
     pd.DataFrame
         filtered datadframe
     """
+    countries = countries if countries else []
+    countries_with_states = countries_with_states if countries_with_states else []
+    states = states if states else []
 
     columns = ["country", "date", "cases", "deaths"]
 
@@ -85,11 +93,17 @@ def filter_data_by_countries(
     ]
     data_no_states = data_no_states.set_index("date")
 
-    data_with_states = (
+    data_multi_states = (
         data.loc[data.country.isin(countries_with_states), columns]
         .groupby(["date", "country"])
         .sum()
     )
-    data_with_states = data_with_states.reset_index(level=1)
+    data_multi_states = data_multi_states.reset_index(level=1)
 
-    return pd.concat([data_no_states, data_with_states])
+    data_single_states = data.loc[data.state.isin(states)].copy()
+    data_single_states.drop(columns="country", inplace=True)
+    data_single_states.rename(columns={"state": "country"}, inplace=True)
+    data_single_states = data_single_states.loc[:, columns]
+    data_single_states.set_index("date", inplace=True)
+
+    return pd.concat([data_no_states, data_multi_states, data_single_states])
