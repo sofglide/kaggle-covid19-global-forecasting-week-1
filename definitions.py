@@ -4,7 +4,6 @@ ROOT_DIR = Path(__file__).parent.absolute()
 DATA_DIR = "data"
 
 DATASET_NAME = "imdevskp/corona-virus-report"
-DATA_FILE = 'covid_19_clean_complete.csv'
 
 MISSING_TOKEN_MSG = """
 Cannot access Kaggle data
