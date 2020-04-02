@@ -19,7 +19,6 @@ def download_data_from_kaggle(
     force: bool = False, quiet: bool = False, unzip=True
 ) -> Path:
     """Downloads competition data from Kaggle
-    
     Parameters
     ----------
     force : bool, optional
@@ -28,7 +27,6 @@ def download_data_from_kaggle(
         quiet mode, by default False
     unzip : bool, optional
         unzip files, by default True
-    
     Returns
     -------
     Path
@@ -48,7 +46,6 @@ def download_data_from_kaggle(
 
 def download_JHU() -> Path:
     """Created dataset file from JHU data
-    
     Returns
     -------
     Path
@@ -56,9 +53,12 @@ def download_JHU() -> Path:
     """
 
     JHU_urls = {
-        "confirmed": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv",
-        "deaths": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv",
-        "recovered": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv",
+        "confirmed": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/"
+        "csse_covid_19_time_series/time_series_covid19_confirmed_global.csv",
+        "deaths": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/"
+        "csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv",
+        "recovered": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/"
+        "csse_covid_19_time_series/time_series_covid19_recovered_global.csv",
     }
 
     JHU_files = {}
@@ -91,11 +91,9 @@ def download_JHU() -> Path:
     full_table = pd.concat([conf_df_long, deaths_df_long["Deaths"]], axis=1, sort=False)
 
     # removing canada's recovered values
-    full_table = full_table[
-        full_table["Province/State"].str.contains("Recovered") != True
-    ]
+    full_table = full_table[not full_table["Province/State"].str.contains("Recovered")]
     # removing county wise data to avoid double counting
-    full_table = full_table[full_table["Province/State"].str.contains(",") != True]
+    full_table = full_table[not full_table["Province/State"].str.contains(",")]
     # renaming countries, regions, provinces
     full_table["Country/Region"] = full_table["Country/Region"].replace(
         "Korea, South", "South Korea"
