@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import pandas as pd
 
+from definitions import COUNTRY_POPULATION, DATA_DIR, ROOT_DIR
+
 
 def plot_by_country(
     data: pd.DataFrame,
@@ -75,3 +77,52 @@ def plot_by_country(
     ax.set_ylim(round_y(y_lim))
 
     plt.show()
+
+
+def plot_by_country_normalize(
+    data: pd.DataFrame,
+    column: str,
+    title: str = None,
+    kind: str = "line",
+    logy: bool = False,
+    figsize: tuple = (15, 7),
+    **kwargs,
+):
+    """Groups data by country and plots 1 column as superposed plots
+    normalize with respect to country population
+    Parameters
+    ----------
+    data : pd.DataFrame
+        dataframe containging data to plot
+    column : str
+        column to plot
+    title : str, optional
+        pyplot title, by default None
+    kind : str, optional
+        pyplot kind argument, by default "line"
+    logy : bool, optional
+        pyplot logy argument, by default False
+    figsize : tuple, optional
+        pyplot figsize argument, by default (15, 7)
+    """
+    population = (
+        pd.read_csv(ROOT_DIR / DATA_DIR / COUNTRY_POPULATION)
+        .loc[:, ["Country Name", "2018 [YR2018]"]]
+        .dropna(axis=0, subset=["Country Name"])
+        .set_index("Country Name")
+        .rename(index={"United States": "US"})
+        .loc[:, "2018 [YR2018]"]
+    )
+
+    population = population.loc[population.apply(str.isnumeric)].astype(int)
+
+    data_normalized = data.copy()
+
+    population_col = population.loc[data_normalized["country"]]
+    population_col.index = data_normalized.index
+
+    data_normalized[["cases", "deaths"]] = data_normalized[["cases", "deaths"]].apply(
+        lambda c: c / population_col * 10 ** 7
+    )
+
+    plot_by_country(data_normalized, column, title, kind, logy, figsize, **kwargs)

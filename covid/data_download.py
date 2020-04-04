@@ -91,9 +91,11 @@ def download_JHU() -> Path:
     full_table = pd.concat([conf_df_long, deaths_df_long["Deaths"]], axis=1, sort=False)
 
     # removing canada's recovered values
-    full_table = full_table[not full_table["Province/State"].str.contains("Recovered")]
+    full_table = full_table[
+        ~full_table["Province/State"].str.contains("Recovered", na=True)
+    ]
     # removing county wise data to avoid double counting
-    full_table = full_table[not full_table["Province/State"].str.contains(",")]
+    full_table = full_table[~full_table["Province/State"].str.contains(",", na=True)]
     # renaming countries, regions, provinces
     full_table["Country/Region"] = full_table["Country/Region"].replace(
         "Korea, South", "South Korea"

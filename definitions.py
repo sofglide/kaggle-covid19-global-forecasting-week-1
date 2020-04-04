@@ -5,6 +5,8 @@ DATA_DIR = "data"
 
 DATASET_NAME = "imdevskp/corona-virus-report"
 
+COUNTRY_POPULATION = "world_population.csv"
+
 MISSING_TOKEN_MSG = """
 Cannot access Kaggle data
 Make sure you have a Kaggle account, you can create one from here https://kaggle.com
