@@ -4,6 +4,8 @@ from typing import List, Optional
 
 import pandas as pd
 
+from definitions import COUNTRY_POPULATION, DATA_DIR, ROOT_DIR
+
 
 def get_start_date(data: pd.DataFrame, column: str, threshold: int = 100) -> pd.Series:
     """[summary]
@@ -107,3 +109,41 @@ def filter_data_by_countries(
     data_single_states.set_index("date", inplace=True)
 
     return pd.concat([data_no_states, data_multi_states, data_single_states])
+
+
+def normalize_to_population(
+    data: pd.DataFrame, population_size: int = 10 ** 7
+) -> pd.DataFrame:
+    """Normalizes data to standard population
+    Parameters
+    ----------
+    data : pd.DataFrame
+        data to normalize
+    population_size : int, optional
+        normal population size, by default 10**7
+    Returns
+    -------
+    pd.DataFrame
+        normalized dataframe
+    """
+    population = (
+        pd.read_csv(ROOT_DIR / DATA_DIR / COUNTRY_POPULATION)
+        .loc[:, ["Country Name", "2018 [YR2018]"]]
+        .dropna(axis=0, subset=["Country Name"])
+        .set_index("Country Name")
+        .rename(index={"United States": "US"})
+        .loc[:, "2018 [YR2018]"]
+    )
+
+    population = population.loc[population.apply(str.isnumeric)].astype(int)
+
+    data_normalized = data.copy()
+
+    population_col = population.loc[data_normalized["country"]]
+    population_col.index = data_normalized.index
+
+    data_normalized[["cases", "deaths"]] = data_normalized[["cases", "deaths"]].apply(
+        lambda c: c / population_col * population_size
+    )
+
+    return data_normalized
