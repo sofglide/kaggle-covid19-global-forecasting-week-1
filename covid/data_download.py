@@ -8,7 +8,7 @@ from urllib import parse
 import pandas as pd
 import wget
 
-from definitions import (  # isort:skip
+from definitions import (
     COUNTRY_POPULATION_CSV,
     COUNTRY_POPULATION_ZIP_CSV,
     DATA_DIR,
