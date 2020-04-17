@@ -1,12 +1,22 @@
 """downloads data from Kaggle."""
 
+import tempfile
+import zipfile
 from pathlib import Path
 from urllib import parse
 
 import pandas as pd
 import wget
 
-from definitions import DATA_DIR, DATASET_NAME, MISSING_TOKEN_MSG, ROOT_DIR
+from definitions import (  # isort:skip
+    COUNTRY_POPULATION_CSV,
+    COUNTRY_POPULATION_ZIP_CSV,
+    DATA_DIR,
+    DATASET_NAME,
+    MISSING_TOKEN_MSG,
+    ROOT_DIR,
+    WORLD_POPULATION_URL,
+)
 
 try:
     import kaggle
@@ -92,10 +102,10 @@ def download_JHU() -> Path:
 
     # removing canada's recovered values
     full_table = full_table[
-        ~full_table["Province/State"].str.contains("Recovered", na=True)
+        ~full_table["Province/State"].str.contains("Recovered", na=False)
     ]
     # removing county wise data to avoid double counting
-    full_table = full_table[~full_table["Province/State"].str.contains(",", na=True)]
+    full_table = full_table[~full_table["Province/State"].str.contains(",", na=False)]
     # renaming countries, regions, provinces
     full_table["Country/Region"] = full_table["Country/Region"].replace(
         "Korea, South", "South Korea"
@@ -113,5 +123,36 @@ def download_JHU() -> Path:
     return full_table_fname
 
 
+def download_world_population():
+    """Download world population data
+    """
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_dir = Path(tmp_dir)
+        tmp_file = wget.download(WORLD_POPULATION_URL, out=str(tmp_dir))
+        with zipfile.ZipFile(tmp_file, "r") as tmp_zip:
+            tmp_csv_path = tmp_zip.extract(COUNTRY_POPULATION_ZIP_CSV, tmp_dir)
+            Path(tmp_csv_path).rename(ROOT_DIR / DATA_DIR / COUNTRY_POPULATION_CSV)
+
+
+def get_population() -> pd.Series:
+    """Reads world population
+    Returns
+    -------
+    pd.Series
+        world population as a series
+    """
+    population = (
+        pd.read_csv(ROOT_DIR / DATA_DIR / COUNTRY_POPULATION_CSV, skiprows=4)
+        .loc[:, ["Country Name", "2018"]]
+        .dropna(axis=0)
+        .set_index("Country Name")
+        .rename(index={"United States": "US"})["2018"]
+        .astype(int)
+    )
+    return population
+
+
 if __name__ == "__main__":
-    download_data_from_kaggle()
+    download_JHU()
+    download_world_population()

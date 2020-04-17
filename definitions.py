@@ -1,3 +1,7 @@
+"""
+Project constants defined here
+"""
+
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.absolute()
@@ -5,7 +9,9 @@ DATA_DIR = "data"
 
 DATASET_NAME = "imdevskp/corona-virus-report"
 
-COUNTRY_POPULATION = "world_population.csv"
+WORLD_POPULATION_URL = "http://api.worldbank.org/v2/en/indicator/SP.POP.TOTL?downloadformat=csv"
+COUNTRY_POPULATION_ZIP_CSV = "API_SP.POP.TOTL_DS2_en_csv_v2_936048.csv"
+COUNTRY_POPULATION_CSV = "world_population.csv"
 
 MISSING_TOKEN_MSG = """
 Cannot access Kaggle data

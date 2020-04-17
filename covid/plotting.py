@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import pandas as pd
 
-from definitions import COUNTRY_POPULATION, DATA_DIR, ROOT_DIR
+from covid.data_download import get_population
 
 
 def plot_by_country(
@@ -105,16 +105,7 @@ def plot_by_country_normalize(
     figsize : tuple, optional
         pyplot figsize argument, by default (15, 7)
     """
-    population = (
-        pd.read_csv(ROOT_DIR / DATA_DIR / COUNTRY_POPULATION)
-        .loc[:, ["Country Name", "2018 [YR2018]"]]
-        .dropna(axis=0, subset=["Country Name"])
-        .set_index("Country Name")
-        .rename(index={"United States": "US"})
-        .loc[:, "2018 [YR2018]"]
-    )
-
-    population = population.loc[population.apply(str.isnumeric)].astype(int)
+    population = get_population()
 
     data_normalized = data.copy()
 

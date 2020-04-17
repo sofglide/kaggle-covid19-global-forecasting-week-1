@@ -4,7 +4,7 @@ from typing import List, Optional
 
 import pandas as pd
 
-from definitions import COUNTRY_POPULATION, DATA_DIR, ROOT_DIR
+from covid.data_download import get_population
 
 
 def get_start_date(data: pd.DataFrame, column: str, threshold: int = 100) -> pd.Series:
@@ -126,16 +126,7 @@ def normalize_to_population(
     pd.DataFrame
         normalized dataframe
     """
-    population = (
-        pd.read_csv(ROOT_DIR / DATA_DIR / COUNTRY_POPULATION)
-        .loc[:, ["Country Name", "2018 [YR2018]"]]
-        .dropna(axis=0, subset=["Country Name"])
-        .set_index("Country Name")
-        .rename(index={"United States": "US"})
-        .loc[:, "2018 [YR2018]"]
-    )
-
-    population = population.loc[population.apply(str.isnumeric)].astype(int)
+    population = get_population()
 
     data_normalized = data.copy()
 
