@@ -4,13 +4,14 @@ import tempfile
 import zipfile
 from pathlib import Path
 from urllib import parse
+import re
 
 import pandas as pd
 import wget
 
 from definitions import (
     COUNTRY_POPULATION_CSV,
-    COUNTRY_POPULATION_ZIP_CSV,
+    COUNTRY_POPULATION_CSV_RE,
     DATA_DIR,
     DATASET_NAME,
     MISSING_TOKEN_MSG,
@@ -131,8 +132,10 @@ def download_world_population():
         tmp_dir = Path(tmp_dir)
         tmp_file = wget.download(WORLD_POPULATION_URL, out=str(tmp_dir))
         with zipfile.ZipFile(tmp_file, "r") as tmp_zip:
-            tmp_csv_path = tmp_zip.extract(COUNTRY_POPULATION_ZIP_CSV, tmp_dir)
-            Path(tmp_csv_path).rename(ROOT_DIR / DATA_DIR / COUNTRY_POPULATION_CSV)
+            for info in tmp_zip.infolist():
+                if re.match(COUNTRY_POPULATION_CSV_RE, info.filename):
+                    tmp_csv_path = tmp_zip.extract(info.filename, tmp_dir)
+                    Path(tmp_csv_path).rename(ROOT_DIR / DATA_DIR / COUNTRY_POPULATION_CSV)
 
 
 def get_population() -> pd.Series:

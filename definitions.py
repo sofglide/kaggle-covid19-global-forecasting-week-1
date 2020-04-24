@@ -10,7 +10,7 @@ DATA_DIR = "data"
 DATASET_NAME = "imdevskp/corona-virus-report"
 
 WORLD_POPULATION_URL = "http://api.worldbank.org/v2/en/indicator/SP.POP.TOTL?downloadformat=csv"
-COUNTRY_POPULATION_ZIP_CSV = "API_SP.POP.TOTL_DS2_en_csv_v2_936048.csv"
+COUNTRY_POPULATION_CSV_RE = r"API_SP.POP.TOTL_DS2_en_csv_.*\.csv"
 COUNTRY_POPULATION_CSV = "world_population.csv"
 
 MISSING_TOKEN_MSG = """
